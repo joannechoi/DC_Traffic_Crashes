@@ -1,183 +1,205 @@
 import pandas as pd
+import numpy as np
+import pickle
 import dash
 from dash import dcc
 from dash import html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
+import dash_bootstrap_components as dbc
 from user_input import options_years, options_wards, \
     options_months, options_weekdays, options_hours, options_conditions, options_precipitation
-from randomforest_dccrash import rf
-
 
 # load data
 df = pd.read_csv('/Users/joanne/PycharmProjects/DATA606_DCCrash/map_data1.csv')
 mapbox_access_token = 'pk.eyJ1IjoiaGNob2k0IiwiYSI6ImNsNHUybndoYjFyYTQzY3BhenRhNXB2djEifQ.XG8Jl_2gapRFufmepYe1mw'
-
-df_2016 = df[df["YEAR"] == 2016]
-df_2017 = df[df["YEAR"] == 2017]
-df_2018 = df[df["YEAR"] == 2018]
-df_2019 = df[df["YEAR"] == 2019]
+with open(r'/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/rf_severity', 'rb') as f1:
+    rf_severity = pickle.load(f1)
+with open(r'/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/xgb_severity', 'rb') as f2:
+    xgb_severity = pickle.load(f2)
 
 # main app
 app = dash.Dash()
 app.layout = html.Div([
-
-    # first row
     html.Div([
+        # map filters
+        html.Div([
+            html.Img(id='dc_flag',
+                     height='180px',
+                     src='assets/Flag_of_the_District_of_Columbia.svg',
+                     style={"border-radius": "20px"}),
+            html.P('Use the filters below to explore the \
+                    historical traffic accident data on the map'),
+            dbc.Row([html.H3(children='Map Filters:')]),
+            dbc.Row([
+                dbc.Col(html.Label("Year:", className="control_label")),
+                dbc.Col(dcc.Dropdown(id='year-dropdown',
+                                     className="dropdown",
+                                     style={"flex-grow": "2"},
+                                     options=options_years,
+                                     multi=False,
+                                     searchable=False,
+                                     value=2019)),
+            ]),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([html.Label("Month:", className="control_label")]),
+                dbc.Col(dcc.Dropdown(id='month-dropdown',
+                                     className="dropdown",
+                                     style={"flex-grow": "2"},
+                                     options=options_months,
+                                     multi=False,
+                                     searchable=False,
+                                     value=9)),
+            ]),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([html.Label("Weekday:", className="control_label")]),
+                dbc.Col(dcc.Dropdown(id='weekday-dropdown',
+                                     className="dropdown",
+                                     style={"flex-grow": "2"},
+                                     options=options_weekdays,
+                                     multi=False,
+                                     searchable=False,
+                                     value=0)),
+            ]),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([html.Label("Hour:", className="control_label")]),
+                dbc.Col(dcc.Dropdown(id='hour-dropdown',
+                                     className="dropdown",
+                                     style={"flex-grow": "2"},
+                                     options=options_hours,
+                                     multi=False,
+                                     searchable=False,
+                                     value=1)),
+            ]),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([html.Label("Ward:", className="control_label")]),
+                dbc.Col(dcc.Dropdown(id='choose-ward',
+                                     className="dropdown",
+                                     style={"flex-grow": "2"},
+                                     options=options_wards,
+                                     multi=False,
+                                     searchable=False,
+                                     value='Ward 5')),
+            ]),
+            html.Br(),
+        ], className="pretty-container three columns"),
 
         # title
         html.Div([
-            html.H1('Washington D.C. Car Accident Dashboard',
-                    style={"textAlign": "center",
-                           "display": "flex",
-                           "alignItems": "center",
-                           "justifyContent": "center"})
-        ], className="pretty-container"),
-
-        # map
-        html.Div([
-            dcc.Graph(id='map-graph', style={'padding-top': '20px',
-                                             'padding-bottom': '20px'})],
-            className="pretty-container"),
-
-        # filters
-        html.Div([
             html.Div([
-                html.H3("Filter by:",
-                        className="filter"),
+                html.H1('Traffic Accidents in Washington D.C.',
+                        style={"textAlign": "center",
+                               "display": "flex",
+                               "alignItems": "center",
+                               "justifyContent": "center"}),
+            ], className='pretty-container'),
 
-                html.H4("Year:",
-                        className="control_label"),
+            # second graphic
+            html.Div([
+                html.H2("Car Accidents in Washington D.C. (2016-2019)",
+                        style={"textAlign": "center",
+                               "color": "ff7f0e"}),
+                dcc.Graph(id='map-graph'),
+            ], className="pretty-container"),
 
-                dcc.Dropdown(id='year-dropdown',
-                             className="input-line",
-                             style={"flex-grow": "2"},
-                             options=options_years,
-                             searchable=False,
-                             value=2019),
+        ], className="basic-container-column twelve columns"),
 
-                html.H4("Month:",
-                        className="control_label"),
+    ], className='basic-container'),
 
-                dcc.Dropdown(id='month-dropdown',
-                             className="input-line",
-                             style={"flex-grow": "2"},
-                             options=options_months,
-                             searchable=False,
-                             value=1),
+    # Second Row
+    html.Div([
+        # Poisson/Negative Regression Model
+        html.Div([
+            dbc.Row([html.H3(children='Predict Number of Car Crashes')]),
+            html.Div([
+                html.P("Describe the model here"),
+            ], className='basic-container-column'),
+            html.Div([
+                dbc.Row([
+                    dbc.Col(html.Label(children='Hour of the Day:'), width={"order": "first"}),
+                    dbc.Col(dcc.Input(value=3, type='number', id='HOUR'))
+                ]),
+                html.Br(),
+                dbc.Row([
+                    dbc.Col(html.Label(children='Day of the Week:'), width={"order": "first"}),
+                    dbc.Col(dcc.Input(value=3, type='number', id='WEEKDAY'))
+                ]),
+                html.Br(),
+                dbc.Row([
+                    dbc.Col(html.Label(children='Month:'), width={"order": "first"}),
+                    dbc.Col(dcc.Input(value=3, type='number', id='MONTH'))
+                ]),
+                html.Br(),
+                dbc.Row([dbc.Button('Submit', id='submit-val', n_clicks=0, color="primary")]),
+                html.Br(),
+                dbc.Row([html.Div(id='prediction output')])
+            ], className='mini_container'),
 
-                html.H4("Weekday:",
-                        className="control_label"),
+        ], className='pretty-container six columns'),
+        # Random Forest - Injury Severity Model
+        html.Div([
+            dbc.Row([html.H3(children='SECOND MODEL GOES HERE')]),
+            html.Div([
+                html.P("Describe the model here"),
+            ], className='basic-container-column'),
+            html.Div([
+                dbc.Row([
+                    dbc.Col(html.Label(children='Hour of the Day:'), width={"order": "first"}),
+                    dbc.Col(dcc.Input(value=3, type='number', id='HOUR1'))
+                ]),
+                html.Br(),
+                dbc.Row([
+                    dbc.Col(html.Label(children='Day of the Week:'), width={"order": "first"}),
+                    dbc.Col(dcc.Input(value=3, type='number', id='WEEKDAY1'))
+                ]),
+                html.Br(),
+                dbc.Row([
+                    dbc.Col(html.Label(children='Month:'), width={"order": "first"}),
+                    dbc.Col(dcc.Input(value=3, type='number', id='MONTH1'))
+                ]),
+                html.Br(),
+                dbc.Row([dbc.Button('Submit', id='submit-val1', n_clicks=0, color="primary")]),
+                html.Br(),
+                dbc.Row([html.Div(id='prediction output1')])
+            ], className='mini_container'),
 
-                dcc.Dropdown(id='weekday-dropdown',
-                             className="input-line",
-                             style={"flex-grow": "2"},
-                             options=options_weekdays,
-                             searchable=False,
-                             value=0),
+        ], className='pretty-container six columns'),
 
-                html.H4("Hour:",
-                        className="control_label"),
+    ], className='basic-container'),
 
-                dcc.Dropdown(id='hour-dropdown',
-                             className="input-line",
-                             style={"flex-grow": "2"},
-                             options=options_hours,
-                             searchable=False,
-                             value=0),
-
-                html.H4("Ward:",
-                        className="control_label"),
-
-                dcc.Dropdown(id='choose-ward',
-                             className="input-line",
-                             style={"flex-grow": "2"},
-                             options=options_wards,
-                             searchable=False,
-                             value="Ward 1"),
-
-            ], className="basic-container-column twelve columns"),
-
-        ], className="basic-container"),
-
-    ], className="basic-container"),
-
-    # second graphic
+    # feature importance and bar chart
     html.Div([
         html.Div([
+            dbc.Row([html.H3(children='Important Risk Factors for Injury Severity')]),
             html.Iframe(id='importance',
                         srcDoc=open(
-                            '/Users/joanne/PycharmProjects/DATA606_DCCrash/venv/assets/featureimportance-bar.html',
+                            '/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/featureimportance-rf.html',
                             'r').read(),
                         width='100%',
-                        height=500,
-                        style={'padding-top': '10px',
-                               'padding-bottom': '10px'}),
-        ], className="pretty-container"),
+                        height=475, ),
+            html.P("This chart display the influence each risk factors had \
+                    on the severity of the injuries sustained during traffic accidents."),
 
-    ], className="pretty-container three columns"),
+        ], className="pretty-container six columns"),
 
-    # random forest - severity level
-    html.Div([
         html.Div([
-            html.H3("Predicted Severity of Accident:",
-                    className="filter"),
-            html.H4("Weather Conditions:",
-                    className="control_label"),
+            dbc.Row([html.H3(children='TITLE PLACEHOLDER')]),
+            html.Iframe(id='importance2',
+                        srcDoc=open(
+                            '/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/featureimportance-xgb.html',
+                            'r').read(),
+                        width='100%',
+                        height=475, ),
+            html.P("ADD CAPTION HERE."),
+        ], className="pretty-container six columns"),
 
-            dcc.Dropdown(id='weather-dropdown',
-                         className="input-line",
-                         style={"flex-grow": "2"},
-                         options=options_conditions,
-                         searchable=False,
-                         value='Conditions_Clear'),
-
-            html.H4("Precipitation:",
-                    className="control_label"),
-
-            dcc.Dropdown(id='precipitation-dropdown',
-                         className="input-line",
-                         style={"flex-grow": "2"},
-                         options=options_precipitation,
-                         searchable=False,
-                         value='1'),
-
-            html.H4("Month:",
-                    className="control_label"),
-
-            dcc.Dropdown(id='month-dropdown1',
-                         className="input-line",
-                         style={"flex-grow": "2"},
-                         options=options_months,
-                         searchable=False,
-                         value=0),
-
-            html.H4("Hour:",
-                    className="control_label"),
-
-            dcc.Dropdown(id='hour-dropdown1',
-                         className="input-line",
-                         style={"flex-grow": "2"},
-                         options=options_hours,
-                         searchable=False,
-                         value=0),
-
-            html.H4("Weekday:",
-                    className="control_label"),
-
-            dcc.Dropdown(id='weekday-dropdown1',
-                         className="input-line",
-                         style={"flex-grow": "2"},
-                         options=options_weekdays,
-                         searchable=False,
-                         value=0),
-
-            html.Div(id='textarea-example-output', style={'whiteSpace': 'pre-line'})
-
-          ], className="pretty-container"),
-
-    ], className='pretty-container three columns')
+    ], className='basic-container'),
 
 ], className="general")
+
 
 ###############################################################################
 
@@ -189,28 +211,26 @@ app.layout = html.Div([
      Input('hour-dropdown', 'value'),
      Input('choose-ward', 'value')])
 def update_map(year, month, weekday, hour, ward):
-    if year == 2016:
-        df2 = df_2016[(df_2016['MONTH'] == month)
-                      & (df_2016['WEEKDAY'] == weekday)
-                      & (df_2016['HOUR'] == hour)
-                      & (df_2016['WARD'] == ward)]
-    elif year == 2017:
-        df2 = df_2017[(df_2017['MONTH'] == month)
-                      & (df_2017['WEEKDAY'] == weekday)
-                      & (df_2017['HOUR'] == hour)
-                      & (df_2017['WARD'] == ward)]
-    elif year == 2018:
-        df2 = df_2018[(df_2018['MONTH'] == month)
-                      & (df_2018['WEEKDAY'] == weekday)
-                      & (df_2018['HOUR'] == hour)
-                      & (df_2018['WARD'] == ward)]
-    elif year == 2019:
-        df2 = df_2019[(df_2019['MONTH'] == month)
-                      & (df_2019['WEEKDAY'] == weekday)
-                      & (df_2019['HOUR'] == hour)
-                      & (df_2019['WARD'] == ward)]
+    dff = df.copy()
+    dff['text'] = 'Address: ' + dff['ADDRESS'] + ' Date: ' + dff['YEAR'].astype(str) + '-' + dff['MONTH'].astype(
+        str) + ' ' + dff['WARD']
+
+    if ((len([hour]) > 1)
+            &(len([year]) == 1)
+            & (len([month]) == 1)
+            & (len([weekday]) == 1)
+            & (len([ward]) == 1)):
+        df2 = dff[(dff['YEAR'] == year)
+                  & (dff['MONTH'] == month)
+                  & (dff['WEEKDAY'] == weekday)
+                  & (dff['HOUR'].isin([hour]))
+                  & (dff['WARD'] == ward)]
     else:
-        all
+        df2 = dff[(dff['YEAR'] == year)
+                  & (dff['MONTH'] == month)
+                  & (dff['WEEKDAY'] == weekday)
+                  & (dff['HOUR'] == hour)
+                  & (dff['WARD'] == ward)]
 
     return {
         "data": [
@@ -221,7 +241,7 @@ def update_map(year, month, weekday, hour, ward):
              "marker": {"sizemin": 2,
                         "color": "#FF0000",
                         "opacity": 1},
-             "text": df2['ADDRESS']}],
+             "text": df2['text']}],
         "layout": dict(
             autosize=True,
             height=500,
@@ -229,7 +249,6 @@ def update_map(year, month, weekday, hour, ward):
             titlefont=dict(color="#485C6E", size='14'),
             margin=dict(l=35, r=35, b=35, t=45),
             hovermode="closest",
-            title=f"Car Accidents in Washington D.C.",
             legend=dict(font=dict(size=10), orientation='h'),
             mapbox=dict(
                 accesstoken=mapbox_access_token,
@@ -238,6 +257,22 @@ def update_map(year, month, weekday, hour, ward):
                 zoom=11))}
 
 
+# Count Based Model
+@app.callback(
+    Output('prediction output', 'children'),
+    Input('submit-val', 'n_clicks'),
+    State('HOUR', 'value'),
+    State('WEEKDAY', 'value'),
+    State('MONTH', 'value')
+)
+def update_output(n_clicks, HOUR, WEEKDAY, MONTH):
+    x = np.array([[HOUR, WEEKDAY, MONTH]])
+    prediction = regressor.predict(x)[0]
+    return f'The predicted number of car accidents is {prediction}.'
+
+
+'''
+# Injury Severity Model 
 @app.callback(
     Output('textarea-example-output', 'children'),
     [Input('weather-dropdown', 'value'),
@@ -256,7 +291,7 @@ def rf_severity(conditions, precipitation, month, hour, weekday):
     else:
         severity = 'Unknown'
     return 'Based on the selected conditions, the predicted severity of the accident is {}'.format(severity)
-
+'''
 
 if __name__ == '__main__':
     app.run_server(debug=True)
