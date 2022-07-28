@@ -7,7 +7,7 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 from user_input import options_years, options_wards, \
-    options_months, options_weekdays, options_hours, options_conditions, options_precipitation
+    options_months, options_weekdays, options_hours, create_dropdown_value
 
 # load data
 df = pd.read_csv('/Users/joanne/PycharmProjects/DATA606_DCCrash/map_data1.csv')
@@ -36,7 +36,7 @@ app.layout = html.Div([
                                      className="dropdown",
                                      style={"flex-grow": "2"},
                                      options=options_years,
-                                     multi=False,
+                                     multi=True,
                                      searchable=False,
                                      value=2019)),
             ]),
@@ -47,7 +47,7 @@ app.layout = html.Div([
                                      className="dropdown",
                                      style={"flex-grow": "2"},
                                      options=options_months,
-                                     multi=False,
+                                     multi=True,
                                      searchable=False,
                                      value=9)),
             ]),
@@ -58,7 +58,7 @@ app.layout = html.Div([
                                      className="dropdown",
                                      style={"flex-grow": "2"},
                                      options=options_weekdays,
-                                     multi=False,
+                                     multi=True,
                                      searchable=False,
                                      value=0)),
             ]),
@@ -69,7 +69,7 @@ app.layout = html.Div([
                                      className="dropdown",
                                      style={"flex-grow": "2"},
                                      options=options_hours,
-                                     multi=False,
+                                     multi=True,
                                      searchable=False,
                                      value=1)),
             ]),
@@ -80,7 +80,7 @@ app.layout = html.Div([
                                      className="dropdown",
                                      style={"flex-grow": "2"},
                                      options=options_wards,
-                                     multi=False,
+                                     multi=True,
                                      searchable=False,
                                      value='Ward 5')),
             ]),
@@ -212,36 +212,39 @@ app.layout = html.Div([
      Input('choose-ward', 'value')])
 def update_map(year, month, weekday, hour, ward):
     dff = df.copy()
-    dff['text'] = 'Address: ' + dff['ADDRESS'] + ' Date: ' + dff['YEAR'].astype(str) + '-' + dff['MONTH'].astype(
-        str) + ' ' + dff['WARD']
+    dff['text'] = 'Address: ' + dff['ADDRESS'] \
+                  + ' Date: ' + dff['YEAR'].astype(str) \
+                  + '-' + dff['MONTH'].astype(str) + ' ' + dff['WARD']
 
-    if ((len([hour]) > 1)
-            &(len([year]) == 1)
-            & (len([month]) == 1)
-            & (len([weekday]) == 1)
-            & (len([ward]) == 1)):
-        df2 = dff[(dff['YEAR'] == year)
-                  & (dff['MONTH'] == month)
-                  & (dff['WEEKDAY'] == weekday)
-                  & (dff['HOUR'].isin([hour]))
-                  & (dff['WARD'] == ward)]
-    else:
-        df2 = dff[(dff['YEAR'] == year)
-                  & (dff['MONTH'] == month)
-                  & (dff['WEEKDAY'] == weekday)
-                  & (dff['HOUR'] == hour)
-                  & (dff['WARD'] == ward)]
+    year_values = create_dropdown_value(year)
+    month_values = create_dropdown_value(month)
+    weekday_values = create_dropdown_value(weekday)
+    hour_values = create_dropdown_value(hour)
+    ward_values = create_dropdown_value(ward)
+
+    dff = dff[dff['YEAR'].isin(year_values)]
+    dff = dff[dff['MONTH'].isin(month_values)]
+    dff = dff[dff['WEEKDAY'].isin(weekday_values)]
+    dff = dff[dff['HOUR'].isin(hour_values)]
+    dff = dff[dff['WARD'].isin(ward_values)]
+
+   # else:
+   #     df2 = dff[(dff['YEAR'] == year)
+   #               & (dff['MONTH'] == month)
+   #               & (dff['WEEKDAY'] == weekday)
+   #               & (dff['HOUR'] == hour)
+   #               & (dff['WARD'] == ward)]
 
     return {
         "data": [
             {"type": "scattermapbox",
-             "lat": df2['LATITUDE'],
-             "lon": df2['LONGITUDE'],
+             "lat": dff['LATITUDE'],
+             "lon": dff['LONGITUDE'],
              "mode": "markers",
              "marker": {"sizemin": 2,
                         "color": "#FF0000",
                         "opacity": 1},
-             "text": df2['text']}],
+             "text": dff['text']}],
         "layout": dict(
             autosize=True,
             height=500,
