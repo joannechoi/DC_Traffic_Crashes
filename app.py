@@ -100,8 +100,7 @@ app.layout = html.Div([
             # second graphic
             html.Div([
                 html.H2("Car Accidents in Washington D.C. (2016-2019)",
-                        style={"textAlign": "center",
-                               "color": "ff7f0e"}),
+                        style={"textAlign": "center"}),
                 dcc.Graph(id='map-graph'),
             ], className="pretty-container"),
 
@@ -113,7 +112,8 @@ app.layout = html.Div([
     html.Div([
         # Poisson/Negative Regression Model
         html.Div([
-            dbc.Row([html.H3(children='Predict Number of Car Crashes')]),
+            dbc.Row([html.H3(children='Predict Number of Car Crashes',
+                             style={"textAlign": "center"})]),
             html.Div([
                 html.P("Describe the model here"),
             ], className='basic-container-column'),
@@ -141,29 +141,34 @@ app.layout = html.Div([
         ], className='pretty-container six columns'),
         # Random Forest - Injury Severity Model
         html.Div([
-            dbc.Row([html.H3(children='SECOND MODEL GOES HERE')]),
+            dbc.Row([html.H3(children='SECOND MODEL GOES HERE',
+                             style={"textAlign": "center"})]),
             html.Div([
                 html.P("Describe the model here"),
             ], className='basic-container-column'),
             html.Div([
-                dbc.Row([
-                    dbc.Col(html.Label(children='Hour of the Day:'), width={"order": "first"}),
-                    dbc.Col(dcc.Input(value=3, type='number', id='HOUR1'))
-                ]),
-                html.Br(),
-                dbc.Row([
-                    dbc.Col(html.Label(children='Day of the Week:'), width={"order": "first"}),
-                    dbc.Col(dcc.Input(value=3, type='number', id='WEEKDAY1'))
-                ]),
-                html.Br(),
-                dbc.Row([
-                    dbc.Col(html.Label(children='Month:'), width={"order": "first"}),
-                    dbc.Col(dcc.Input(value=3, type='number', id='MONTH1'))
-                ]),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.Label(children='Hour of the Day:'), width={"order": "first"}),
+                        dbc.Col(dcc.Input(value=3, type='number', id='HOUR1'))
+                    ]),
+                    html.Br(),
+                    dbc.Row([
+                        dbc.Col(html.Label(children='Day of the Week:'), width={"order": "first"}),
+                        dbc.Col(dcc.Input(value=3, type='number', id='WEEKDAY1'))
+                    ]),
+                    html.Br(),
+                    dbc.Row([
+                        dbc.Col(html.Label(children='Month:'), width={"order": "first"}),
+                        dbc.Col(dcc.Input(value=3, type='number', id='MONTH1'))
+                    ]),
+                ], className='sidebyside'),
+
                 html.Br(),
                 dbc.Row([dbc.Button('Submit', id='submit-val1', n_clicks=0, color="primary")]),
                 html.Br(),
-                dbc.Row([html.Div(id='prediction output1')])
+                dbc.Row([html.Div(id='prediction output1')]),
+
             ], className='mini_container'),
 
         ], className='pretty-container six columns'),
@@ -173,7 +178,8 @@ app.layout = html.Div([
     # feature importance and bar chart
     html.Div([
         html.Div([
-            dbc.Row([html.H3(children='Important Risk Factors for Injury Severity')]),
+            dbc.Row([html.H3(children='Important Risk Factors for Injury Severity',
+                             style={"textAlign": "center"})]),
             html.Iframe(id='importance',
                         srcDoc=open(
                             '/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/featureimportance-rf.html',
@@ -186,7 +192,8 @@ app.layout = html.Div([
         ], className="pretty-container six columns"),
 
         html.Div([
-            dbc.Row([html.H3(children='TITLE PLACEHOLDER')]),
+            dbc.Row([html.H3(children='TITLE PLACEHOLDER',
+                             style={"textAlign": "center"})]),
             html.Iframe(id='importance2',
                         srcDoc=open(
                             '/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/featureimportance-xgb.html',
@@ -227,13 +234,6 @@ def update_map(year, month, weekday, hour, ward):
     dff = dff[dff['WEEKDAY'].isin(weekday_values)]
     dff = dff[dff['HOUR'].isin(hour_values)]
     dff = dff[dff['WARD'].isin(ward_values)]
-
-   # else:
-   #     df2 = dff[(dff['YEAR'] == year)
-   #               & (dff['MONTH'] == month)
-   #               & (dff['WEEKDAY'] == weekday)
-   #               & (dff['HOUR'] == hour)
-   #               & (dff['WARD'] == ward)]
 
     return {
         "data": [
