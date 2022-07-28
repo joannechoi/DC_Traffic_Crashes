@@ -1,23 +1,27 @@
 * {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color:#485C6E;
+  color:#050533;
 }
-
-h1 {
-  color: #485C6E;
+body{
+    background-color: #E8EEF1;
+}
+H1 {
+  color: #050533;
   font-size:40px;
 }
 
-h2 {
+H2 {
   margin-bottom: 1.5em;
+    color: #050533;
 }
 
-h3 {
-  color: #ff7f0e;
+H3 {
+  color: #050533;
+  justify-content: center;
 }
 
-h4 {
-  color:#5C8798;
+H4 {
+  color:#0D698B;
   margin-top: 3em;
   margin-bottom: 0.5em;
 }
@@ -28,11 +32,6 @@ h5 {
 
 .sidebyside {
   display: flex;
-}
-
-.input-line {
-    border-radius:  5px;
-    margin: 5px;
 }
 
 .basic-container {
@@ -47,7 +46,7 @@ h5 {
 
 .mini_container {
   border-radius: 5px;
-  background-color: #FFF7F1;
+  background-color: #F2F1E8;
   margin-top: 20px;
   margin-bottom: 40px;
   padding: 15px;
@@ -72,7 +71,7 @@ h5 {
 
  .pretty-container {
    border-radius: 20px;
-   background-color: #e8f1f9;
+   background-color: #7E9DC2;
    margin: 10px;
    padding: 15px;
    position: relative;
@@ -93,8 +92,8 @@ button {
   cursor: pointer;
   border: 0px;
   border-radius: 5px;
-  background-color: #485C6E;
+  background-color: #E34234;
   color: white;
   text-transform: uppercase;
-  font-size: 15px
+  font-size: 15px;
 }
