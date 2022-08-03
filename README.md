@@ -19,8 +19,12 @@ Develop a dashboard that will displays pertinent DC traffic accident information
   - Baltimore/Washington (https://w2.weather.gov/climate/local_data.php?wfo=lwx)
 
 ## Methodology & Analysis
-
-
+- Count Base Regression
+  - Random Forest Regression model
+  - XGBoost Regression model
+- Injury Severity Classification
+  - Random Forest Classification model
+  - XGBoost Classification model
 ## Conclusion
 ## Dashboard
  
