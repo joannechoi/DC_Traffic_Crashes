@@ -23,10 +23,10 @@ Develop a dashboard that will displays pertinent DC traffic accident information
   - Random Forest Regression model
   - XGBoost Regression model
 - Injury Severity Classification
+    - Required SMOTE create even distribution due to highly imbalanced data among classes.
   - Random Forest Classification model
   - XGBoost Classification model
-    - Required SMOTE create even distribution due to highly imbalanced data among classes.
 ## Conclusion
 ## Dashboard
- 
+- Utilized Plotly and Dash to create the dashboard
  
