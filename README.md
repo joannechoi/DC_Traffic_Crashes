@@ -1,8 +1,10 @@
 # Washington D.C. Traffic Crashes Dashboard
 University of Maryland, Baltimore County 
+<br>
+Under the advisement of Dr. Tony Diana 
 
 ### Authors:
-#### Sam Clark:
+#### Sam Clark
 #### Joanne Choi
 Masters candidate for Data Science at University of Maryland, Baltimore County. Experienced IT specialist with experience as Software Test Engineer for 7 years. Currently working as Data Quality Specialist at the Smithsonian Institution. As a fellow D.C. commuter, examining and understanding the traffic accidents within the district was informative and intriguing.
 
@@ -22,6 +24,7 @@ Develop a dashboard that will displays pertinent DC traffic accident information
   - Baltimore/Washington (https://w2.weather.gov/climate/local_data.php?wfo=lwx)
 
 ## Methodology & Analysis
+Machine Learning Models:
 - Count Base Regression
   - Random Forest Regression model
   - XGBoost Regression model
@@ -29,9 +32,11 @@ Develop a dashboard that will displays pertinent DC traffic accident information
     - Required SMOTE create even distribution due to highly imbalanced data among classes.
   - Random Forest Classification model
   - XGBoost Classification model
-  
-## Conclusion
 
-## Dashboard
-- Utilized Plotly and Dash to create the dashboard
- 
+Analysis:
+- XGBoost models performed better for both regression and classification models.
+- X, Y, Z were the most importance features for the regression model.
+- The days of the week were the most important features for the classification model.  
+  
+## Implementation
+- Dash by Plotly was used to implement the dashboard. 
