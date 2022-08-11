@@ -1,7 +1,10 @@
 # Washington D.C. Traffic Crashes Dashboard
 University of Maryland, Baltimore County 
 
-Authors: Sam Clark & Joanne Choi
+### Authors:
+#### Sam Clark:
+#### Joanne Choi
+Masters candidate for Data Science at University of Maryland, Baltimore County. Experienced IT specialist with experience as Software Test Engineer for 7 years. Currently working as Data Quality Specialist at the Smithsonian Institution. As a fellow D.C. commuter, examining and understanding the traffic accidents within the district was informative and intriguing.
 
 ## Background Information
 - Washington DC is a major metropolitan area with commuters within D.C. as well as from Maryland and Virignia. 
@@ -26,7 +29,9 @@ Develop a dashboard that will displays pertinent DC traffic accident information
     - Required SMOTE create even distribution due to highly imbalanced data among classes.
   - Random Forest Classification model
   - XGBoost Classification model
+  
 ## Conclusion
+
 ## Dashboard
 - Utilized Plotly and Dash to create the dashboard
  
