@@ -4,9 +4,9 @@ University of Maryland, Baltimore County
 Under the advisement of Dr. Tony Diana 
 
 ### Authors:
-#### Sam Clark
 #### Joanne Choi
 Masters candidate for Data Science at University of Maryland, Baltimore County. Experienced IT specialist with experience as Software Test Engineer for 7 years. Currently working as Data Quality Specialist at the Smithsonian Institution. As a fellow D.C. commuter, examining and understanding the traffic accidents within the district was informative and intriguing.
+#### Sam Clark
 
 ## Background Information
 - Washington DC is a major metropolitan area with commuters within D.C. as well as from Maryland and Virignia. 
