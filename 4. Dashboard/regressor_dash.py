@@ -39,11 +39,11 @@ app.layout = html.Div([
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Maximum Temperature):'), width={"order": "first"}),
-       dbc.Col(dcc.Input(value = 3, type='number', id='Maximum Temperature'))     
+       dbc.Col(dcc.Input(value = 3, type='number', id='max_temp'))     
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Minimum Temperature):'), width={"order": "first"}),
-       dbc.Col(dcc.Input(value = 3, type='number', id='Minimum Temperature'))     
+       dbc.Col(dcc.Input(value = 3, type='number', id='min_temp'))     
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Temperature):'), width={"order": "first"}),
@@ -51,11 +51,11 @@ app.layout = html.Div([
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Wind Chill):'), width={"order": "first"}),
-       dbc.Col(dcc.Input(value = 3, type='number', id='Wind Chill'))     
+       dbc.Col(dcc.Input(value = 3, type='number', id='wind_chill'))     
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Heat Index):'), width={"order": "first"}),
-       dbc.Col(dcc.Input(value = 3, type='number', id='Heat Index'))     
+       dbc.Col(dcc.Input(value = 3, type='number', id='heat_index'))     
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Snow):'), width={"order": "first"}),
@@ -63,15 +63,15 @@ app.layout = html.Div([
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Snow Depth):'), width={"order": "first"}),
-       dbc.Col(dcc.Input(value = 3, type='number', id='Snow Depth'))     
+       dbc.Col(dcc.Input(value = 3, type='number', id='snow_depth'))     
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Wind Speed):'), width={"order": "first"}),
-       dbc.Col(dcc.Input(value = 3, type='number', id='Wind Speed'))     
+       dbc.Col(dcc.Input(value = 3, type='number', id='wind_speed'))     
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Wind Gust):'), width={"order": "first"}),
-       dbc.Col(dcc.Input(value = 3, type='number', id='Wind Gust'))     
+       dbc.Col(dcc.Input(value = 3, type='number', id='wind_gust'))     
     ]),
     dbc.Row([
        dbc.Col(html.Label(children='Visibility):'), width={"order": "first"}),
@@ -93,21 +93,23 @@ app.layout = html.Div([
     State('HOUR', 'value'),
     State('WEEKDAY', 'value'),
     State('MONTH', 'value'),
-    State('Maximum Temperature', 'value'),
-    State('Minimum Temperature', 'value'),
+    State('max_temp', 'value'),
+    State('min_temp', 'value'),
     State('Temperature', 'value'),
-    State('Wind Chill', 'value'),
-    State('Heat Index', 'value'),
+    State('wind_chill', 'value'),
+    State('heat_index', 'value'),
     State('Snow', 'value'),
-    State('Snow Depth', 'value'),
-    State('Wind Speed', 'value'),
-    State('Wind Gust', 'value'),
+    State('snow_depth', 'value'),
+    State('wind_speed', 'value'),
+    State('wind_gust', 'value'),
     State('Visibility', 'value')
 
 )
    
-def update_output(n_clicks, HOUR, WEEKDAY, MONTH, ):    
-    x = np.array([[HOUR, WEEKDAY, MONTH]])
+def update_output(n_clicks, HOUR, WEEKDAY, MONTH, max_temp, min_temp, Temperature, wind_chill, heat_index, Snow,
+                  snow_depth, wind_speed, wind_gust, Visability):    
+    x = np.array([[HOUR, WEEKDAY, MONTH, max_temp, min_temp, Temperature, wind_chill, heat_index, 
+                   Snow, snow_depth, wind_speed, wind_gust, Visability]])
     prediction = regressor.predict(x)[0]
     return f'The predicted number of car accidents is {prediction}.'### Run the App ###############################################
 if __name__ == '__main__':
