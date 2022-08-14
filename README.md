@@ -36,8 +36,9 @@ Machine Learning Models:
 
 Analysis:
 - XGBoost models performed better for both regression and classification models.
-- X, Y, Z were the most importance features for the regression model.
-- The days of the week were the most important features for the classification model.  
+ - Regression Accuracy: 81%   |   Classification Accuracy: 97%
+- The hour of the day was the most important features for predicting the count of accidents.
+- The days of the week were the most important features for predicting the severity of the accidents.
   
 ## Implementation
 - Dash by Plotly was used to implement the dashboard. 
