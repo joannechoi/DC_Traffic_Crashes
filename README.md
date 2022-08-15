@@ -42,3 +42,6 @@ Analysis:
   
 ## Implementation
 - Dash by Plotly was used to implement the dashboard. 
+
+![dashboard screenshot1](https://github.com/joannechoi/DC_Traffic_Crashes/blob/main/4.%20Dashboard/assets/dashboard_1.gif)
+![dashboard screenshot2](https://github.com/joannechoi/DC_Traffic_Crashes/blob/main/4.%20Dashboard/assets/dashboard_2.gif)
