@@ -12,8 +12,10 @@ from user_input import options_years, options_wards, \
 # load data
 df = pd.read_csv('/Users/joanne/PycharmProjects/DATA606_DCCrash/map_data1.csv')
 mapbox_access_token = 'pk.eyJ1IjoiaGNob2k0IiwiYSI6ImNsNHUybndoYjFyYTQzY3BhenRhNXB2djEifQ.XG8Jl_2gapRFufmepYe1mw'
-with open(r'/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/rf_severity', 'rb') as f1:
-    rf_severity = pickle.load(f1)
+
+with open(r'/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/xgb_regression', 'rb') as f:
+    regressor = pickle.load(f)
+
 with open(r'/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/xgb_severity', 'rb') as f2:
     xgb_severity = pickle.load(f2)
 
@@ -24,7 +26,7 @@ app.layout = html.Div([
         # map filters
         html.Div([
             html.Img(id='dc_flag',
-                     height='180px',
+                     height='130px',
                      src='assets/Flag_of_the_District_of_Columbia.svg',
                      style={"border-radius": "20px"}),
             html.P('Use the filters below to explore the \
@@ -37,7 +39,7 @@ app.layout = html.Div([
                                      style={"flex-grow": "2"},
                                      options=options_years,
                                      multi=True,
-                                     searchable=False,
+                                     searchable=True,
                                      value=2019)),
             ]),
             html.Br(),
@@ -48,8 +50,9 @@ app.layout = html.Div([
                                      style={"flex-grow": "2"},
                                      options=options_months,
                                      multi=True,
-                                     searchable=False,
-                                     value=9)),
+                                     searchable=True,
+                                     value=9
+                                     )),
             ]),
             html.Br(),
             dbc.Row([
@@ -59,7 +62,7 @@ app.layout = html.Div([
                                      style={"flex-grow": "2"},
                                      options=options_weekdays,
                                      multi=True,
-                                     searchable=False,
+                                     searchable=True,
                                      value=0)),
             ]),
             html.Br(),
@@ -70,7 +73,7 @@ app.layout = html.Div([
                                      style={"flex-grow": "2"},
                                      options=options_hours,
                                      multi=True,
-                                     searchable=False,
+                                     searchable=True,
                                      value=1)),
             ]),
             html.Br(),
@@ -81,7 +84,7 @@ app.layout = html.Div([
                                      style={"flex-grow": "2"},
                                      options=options_wards,
                                      multi=True,
-                                     searchable=False,
+                                     searchable=True,
                                      value='Ward 5')),
             ]),
             html.Br(),
@@ -110,98 +113,277 @@ app.layout = html.Div([
 
     # Second Row
     html.Div([
-        # Poisson/Negative Regression Model
         html.Div([
-            dbc.Row([html.H3(children='Predict Number of Car Crashes',
+            dbc.Col([html.H2(children='Project Summary',
                              style={"textAlign": "center"})]),
+
             html.Div([
-                html.P("Describe the model here"),
-            ], className='basic-container-column'),
+                dbc.Row([dcc.Markdown('''
+                    ### Overview
+    
+                    - 2/3 of D.C. commuters drive alone (1)
+                    - Average D.C. commute is 43 minutes compared to national average of 27 minutes (2)
+                    - Most number of car accidents occur during early morning around 5 AM 
+                    - Car accidents are highly correlated with precipitation
+                    - Major risk factors: 
+                      - Weather conditions
+                      - Time of day, weekday, month 
+    
+                    ### Machine Learning  
+                    - XGBoost Algorithm was used for both predictive models
+                      - [Learn more about XGBoost here!](https://machinelearningmastery.com/gentle-introduction-xgboost-applied-machine-learning/)
+                    - Features: Hour of the day, Day of the week, Month, Maximum Temperature, Minimum Temperature, Temperature, Wind Chill, Heat Index, Snow, Snow Depth, Wind Speed, Wind Gust, Visibility
+                      - Weather Data Dictionary: [Link](https://www.visualcrossing.com/resources/documentation/weather-data/weather-data-documentation/)
+                    - Regression Model 
+                      - Independent Variable: Count of accidents aggregated per day
+                      - Accuracy: 81% 
+                    - Classification Model
+                      - Classes: Minor injuries, Major Injuries, Fatal 
+                      - Accuracy: 97%   
+                    
+                    ### Future Updates 
+    
+                    - Include traffic incidents data from MD and VA
+                    - Incorporate traffic volume data
+                    - Improve model performance through utilizing stacked models 
+                    - Continuous integration of traffic incident data to train models 
+                    - 
+                    
+                    ### References
+                    1. National Capital Region Transportation Planning Board. (2019). 2019 STATE OF THE COMMUTE SURVEY Technical Survey Report. [Link](https://www.mwcog.org/file.aspx?&A=1AAuS26tuk0qvTVF52Q7%2BD87l582VWw4yNkHhrI8JrM%3D)
+                    2. Berkon, E. (2020). D.C. has some of the longest commutes in the COUNTRY. what help is available? [Link](https://www.npr.org/local/305/2020/01/24/799292338/d-c-has-some-of-the-longest-commutes-in-the-country-what-help-is-available)
+                    
+                    ### Github
+                    Link to the project Github repository - [DC Traffic Crashes](https://github.com/joannechoi/DC_Traffic_Crashes)
+                    
+                    ### About Us
+                    Joanne and Sam are Masters candidates at University of Maryland, Baltimore County for Data Science. 
+                    
+                    ''', style={"height": '950px'})]),
+
+            ], className='mini_container'),
+
+        ], className='pretty-container six columns'),
+
+        # Count Based Model
+        html.Div([
+            dbc.Row([html.H2(children='Predict Number of Car Crashes',
+                             style={"textAlign": "center"}),
+                    dbc.Col(html.H4("This model will predict the number of car accidents that may occur based \
+                 on the selected criteria."))]),
+
             html.Div([
-                dbc.Row([
-                    dbc.Col(html.Label(children='Hour of the Day:'), width={"order": "first"}),
-                    dbc.Col(dcc.Input(value=3, type='number', id='HOUR'))
-                ]),
-                html.Br(),
-                dbc.Row([
-                    dbc.Col(html.Label(children='Day of the Week:'), width={"order": "first"}),
-                    dbc.Col(dcc.Input(value=3, type='number', id='WEEKDAY'))
-                ]),
-                html.Br(),
-                dbc.Row([
-                    dbc.Col(html.Label(children='Month:'), width={"order": "first"}),
-                    dbc.Col(dcc.Input(value=3, type='number', id='MONTH'))
-                ]),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Hour of the Day:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Dropdown(id='HOUR',
+                                             className="dropdown",
+                                             style={"width": "150px"},
+                                             options=options_hours,
+                                             multi=False,
+                                             searchable=True,
+                                             value=0), style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Day of the Week:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Dropdown(id='WEEKDAY',
+                                             className="dropdown",
+                                             style={"width": "150px"},
+                                             options=options_weekdays,
+                                             multi=False,
+                                             searchable=True,
+                                             value=0), style={'display':'inline-block', 'margin-right': 20}),
+
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Month:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Dropdown(id='MONTH',
+                                             className="dropdown",
+                                             style={"width": "150px"},
+                                             options=options_months,
+                                             multi=False,
+                                             searchable=True,
+                                             value=1
+                                             ), style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Maximum Temperature:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='max_temp'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Minimum Temperature:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='min_temp'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Temperature:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='Temperature'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Visibility:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=10, id='Visibility'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Heat Index:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=120, id='heat_index'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Snow:',
+                                style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='Snow'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Snow Depth:',
+                                style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='snow_depth'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Wind Speed:',
+                                style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=50, id='wind_speed'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Wind Gust:',
+                                style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=80, id='wind_gust'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Wind Chill:',
+                                           style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-10, max=50, id='wind_chill'),
+                                style={'display':'inline-block', 'margin-right': 20}),
+                    ]),
+                ], className='sidebyside'),
                 html.Br(),
                 dbc.Row([dbc.Button('Submit', id='submit-val', n_clicks=0, color="primary")]),
                 html.Br(),
                 dbc.Row([html.Div(id='prediction output')])
+
             ], className='mini_container'),
 
-        ], className='pretty-container six columns'),
-        # Random Forest - Injury Severity Model
-        html.Div([
-            dbc.Row([html.H3(children='SECOND MODEL GOES HERE',
-                             style={"textAlign": "center"})]),
-            html.Div([
-                html.P("Describe the model here"),
-            ], className='basic-container-column'),
+            # Classification Model
+            dbc.Row([html.H2(children='Predict the Severity of Accident',
+                             style={"textAlign": "center"}),
+                     html.H4("This model will predict the severity of the injury that may be sustained \
+                                     during an accident based on the selected criteria."),
+                     ]),
+
             html.Div([
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.Label(children='Hour of the Day:'), width={"order": "first"}),
-                        dbc.Col(dcc.Input(value=3, type='number', id='HOUR1'))
+                        dbc.Col(html.H5("Hour of the Day:", style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Dropdown(id='HOUR1',
+                                             className="dropdown",
+                                             style={"width": "150px"},
+                                             options=options_hours,
+                                             multi=False,
+                                             searchable=True,
+                                             value=0), style={'display': 'inline-block', 'margin-right': 20}),
                     ]),
-                    html.Br(),
                     dbc.Row([
-                        dbc.Col(html.Label(children='Day of the Week:'), width={"order": "first"}),
-                        dbc.Col(dcc.Input(value=3, type='number', id='WEEKDAY1'))
+                        dbc.Col(html.H5(children='Day of the Week:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Dropdown(id='WEEKDAY1',
+                                             className="dropdown",
+                                             style={"width": "150px"},
+                                             options=options_weekdays,
+                                             multi=False,
+                                             searchable=True,
+                                             value=0), style={'display': 'inline-block', 'margin-right': 20}),
+
                     ]),
-                    html.Br(),
                     dbc.Row([
-                        dbc.Col(html.Label(children='Month:'), width={"order": "first"}),
-                        dbc.Col(dcc.Input(value=3, type='number', id='MONTH1'))
+                        dbc.Col(html.H5(children='Month:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Dropdown(id='MONTH1',
+                                             className="dropdown",
+                                             style={"width": "150px"},
+                                             options=options_months,
+                                             multi=False,
+                                             searchable=True,
+                                             value=1), style={'display': 'inline-block', 'margin-right': 20}),
                     ]),
                 ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Maximum Temperature:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='max_temp1'))
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Minimum Temperature:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='min_temp1'))
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Temperature:')),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='Temperature1'))
+                    ]),
+                ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(
+                            html.H5(children='Visibility:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=10, id='Visibility1'),
+                                style={'display':'inline-block', 'margin-right': 20})
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Heat Index:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=120, id='heat_index1'),
+                                style={'display':'inline-block', 'margin-right': 20})
+                    ]),
+                ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Snow:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='Snow1'),
+                                style={'display':'inline-block', 'margin-right': 20})
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Snow Depth:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='snow_depth1'),
+                                style={'display':'inline-block', 'margin-right': 20})
+                    ]),
+                ], className='sidebyside'),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Wind Speed:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=50, id='wind_speed1'),
+                                style={'display':'inline-block', 'margin-right': 20})
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Wind Gust:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=80, id='wind_gust1'),
+                                style={'display':'inline-block', 'margin-right': 20})
+                    ]),
+                    dbc.Row([
+                        dbc.Col(
+                            html.H5(children='Wind Chill:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=-10, max=50, id='wind_chill1'),
+                                style={'display':'inline-block', 'margin-right': 20})
+                    ]),
 
+                ], className='sidebyside'),
                 html.Br(),
                 dbc.Row([dbc.Button('Submit', id='submit-val1', n_clicks=0, color="primary")]),
                 html.Br(),
-                dbc.Row([html.Div(id='prediction output1')]),
+                dbc.Row([html.Div(id='prediction output1')])
 
             ], className='mini_container'),
 
         ], className='pretty-container six columns'),
-
-    ], className='basic-container'),
-
-    # feature importance and bar chart
-    html.Div([
-        html.Div([
-            dbc.Row([html.H3(children='Important Risk Factors for Injury Severity',
-                             style={"textAlign": "center"})]),
-            html.Iframe(id='importance',
-                        srcDoc=open(
-                            '/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/featureimportance-rf.html',
-                            'r').read(),
-                        width='100%',
-                        height=475, ),
-            html.P("This chart display the influence each risk factors had \
-                    on the severity of the injuries sustained during traffic accidents."),
-
-        ], className="pretty-container six columns"),
-
-        html.Div([
-            dbc.Row([html.H3(children='TITLE PLACEHOLDER',
-                             style={"textAlign": "center"})]),
-            html.Iframe(id='importance2',
-                        srcDoc=open(
-                            '/Users/joanne/PycharmProjects/DATA606_DCCrash/assets/featureimportance-xgb.html',
-                            'r').read(),
-                        width='100%',
-                        height=475, ),
-            html.P("ADD CAPTION HERE."),
-        ], className="pretty-container six columns"),
 
     ], className='basic-container'),
 
@@ -266,35 +448,60 @@ def update_map(year, month, weekday, hour, ward):
     Input('submit-val', 'n_clicks'),
     State('HOUR', 'value'),
     State('WEEKDAY', 'value'),
-    State('MONTH', 'value')
+    State('MONTH', 'value'),
+    State('max_temp', 'value'),
+    State('min_temp', 'value'),
+    State('Temperature', 'value'),
+    State('Visibility', 'value'),
+    State('heat_index', 'value'),
+    State('Snow', 'value'),
+    State('snow_depth', 'value'),
+    State('wind_speed', 'value'),
+    State('wind_gust', 'value'),
+    State('wind_chill', 'value')
 )
-def update_output(n_clicks, HOUR, WEEKDAY, MONTH):
-    x = np.array([[HOUR, WEEKDAY, MONTH]])
+def update_output(n_clicks, HOUR, WEEKDAY, MONTH, max_temp, min_temp, Temperature, Visibility,heat_index, Snow,
+                  snow_depth, wind_speed, wind_gust, wind_chill):
+    x = np.array([[HOUR, WEEKDAY, MONTH, max_temp, min_temp, Temperature, Visibility, heat_index,
+                   Snow, snow_depth, wind_speed, wind_gust, wind_chill]])
     prediction = regressor.predict(x)[0]
-    return f'The predicted number of car accidents is {prediction}.'
+    return f'Results: Based on the selected conditions, the predicted number of car accidents is {prediction}.'
 
 
-'''
-# Injury Severity Model 
 @app.callback(
-    Output('textarea-example-output', 'children'),
-    [Input('weather-dropdown', 'value'),
-     Input('precipitation-dropdown', 'value'),
-     Input('month-dropdown1', 'value'),
-     Input('hour-dropdown1', 'value'),
-     Input('weekday-dropdown1', 'value')])
-def rf_severity(conditions, precipitation, month, hour, weekday):
-    severity_pred = rf.predict(conditions, precipitation, month, hour, weekday)
+    Output('prediction output1', 'children'),
+    Input('submit-val1', 'n_clicks'),
+    State('HOUR1', 'value'),
+    State('WEEKDAY1', 'value'),
+    State('MONTH1', 'value'),
+    State('max_temp1', 'value'),
+    State('min_temp1', 'value'),
+    State('Temperature1', 'value'),
+    State('Visibility1', 'value'),
+    State('heat_index1', 'value'),
+    State('Snow1', 'value'),
+    State('snow_depth1', 'value'),
+    State('wind_speed1', 'value'),
+    State('wind_gust1', 'value'),
+    State('wind_chill1', 'value')
+)
+def update_output(n_clicks, HOUR1, WEEKDAY1, MONTH1, max_temp1, min_temp1, Temperature1, Visibility1, heat_index1,
+                  Snow1, snow_depth1, wind_speed1, wind_gust1, wind_chill1):
+    x = np.array([[HOUR1, WEEKDAY1, MONTH1, max_temp1, min_temp1, Temperature1, Visibility1, heat_index1, Snow1,
+                   snow_depth1, wind_speed1, wind_gust1, wind_chill1]])
+    severity_pred = xgb_severity.predict(x)[0]
+    print(severity_pred)
+
     if severity_pred == 0:
-        severity = 'Major'
+        severity_pred = 'Minor'
     elif severity_pred == 1:
-        severity = 'Minor'
+        severity_pred = 'Major'
     elif severity_pred == 2:
-        severity = 'Fatal'
+        severity_pred = 'Fatal'
     else:
-        severity = 'Unknown'
-    return 'Based on the selected conditions, the predicted severity of the accident is {}'.format(severity)
-'''
+        severity_pred = 'Unknown'
+    return f'Results: Based on the selected conditions, the predicted severity of the accident is {severity_pred}'
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
