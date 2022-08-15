@@ -132,8 +132,21 @@ app.layout = html.Div([
                     ### Machine Learning  
                     - XGBoost Algorithm was used for both predictive models
                       - [Learn more about XGBoost here!](https://machinelearningmastery.com/gentle-introduction-xgboost-applied-machine-learning/)
-                    - Features: Hour of the day, Day of the week, Month, Maximum Temperature, Minimum Temperature, Temperature, Wind Chill, Heat Index, Snow, Snow Depth, Wind Speed, Wind Gust, Visibility
-                      - Weather Data Dictionary: [Link](https://www.visualcrossing.com/resources/documentation/weather-data/weather-data-documentation/)
+                      
+                    | Feature      | Description |
+                    | ----------- | ----------- |
+                    | Maximum Temperature | Maximum temperature over period in Fahrenheit |
+                    | Minimum Temperature | Minimum temperature over period in Fahrenheit |                  
+                    | Wind Chill  | Wind Chill |     
+                    | Heat Index | Heat Index |     
+                    | Snow   | Amount of new snowfall |     
+                    | Snow Depth  | Depth of snow on ground  |     
+                    | Wind Speed   | 2 minute average of wind speed |     
+                    | Wind Gust   | Instantaneous speed of wind  |     
+                    | Visibility  | Distance that can be viewed  |     
+                    | Precipitation   | Amount of liquid equivalent precipitation (rain, snow etc.)|     
+                    | Weather Data Dictionary | [Link](https://www.visualcrossing.com/resources/documentation/weather-data/weather-data-documentation/)| 
+                      
                     - Regression Model 
                       - Independent Variable: Count of accidents aggregated per day
                       - Accuracy: 81% 
@@ -147,7 +160,6 @@ app.layout = html.Div([
                     - Incorporate traffic volume data
                     - Improve model performance through utilizing stacked models 
                     - Continuous integration of traffic incident data to train models 
-                    - 
                     
                     ### References
                     1. National Capital Region Transportation Planning Board. (2019). 2019 STATE OF THE COMMUTE SURVEY Technical Survey Report. [Link](https://www.mwcog.org/file.aspx?&A=1AAuS26tuk0qvTVF52Q7%2BD87l582VWw4yNkHhrI8JrM%3D)
@@ -155,11 +167,8 @@ app.layout = html.Div([
                     
                     ### Github
                     Link to the project Github repository - [DC Traffic Crashes](https://github.com/joannechoi/DC_Traffic_Crashes)
-                    
-                    ### About Us
-                    Joanne and Sam are Masters candidates at University of Maryland, Baltimore County for Data Science. 
-                    
-                    ''', style={"height": '950px'})]),
+                
+                    ''', style={"height": '1200px'})]),
 
             ], className='mini_container'),
 
@@ -209,24 +218,24 @@ app.layout = html.Div([
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.H5(children='Maximum Temperature:')),
+                        dbc.Col(html.H5(children='Max Temperature (F):')),
                         dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='max_temp'),
                                 style={'display':'inline-block', 'margin-right': 20}),
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Minimum Temperature:')),
+                        dbc.Col(html.H5(children='Min Temperature (F):')),
                         dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='min_temp'),
                                 style={'display':'inline-block', 'margin-right': 20}),
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Temperature:')),
+                        dbc.Col(html.H5(children='Temperature (F):')),
                         dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='Temperature'),
                                 style={'display':'inline-block', 'margin-right': 20}),
                     ]),
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.H5(children='Visibility:')),
+                        dbc.Col(html.H5(children='Visibility (ft) :')),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=10, id='Visibility'),
                                 style={'display':'inline-block', 'margin-right': 20}),
                     ]),
@@ -238,27 +247,33 @@ app.layout = html.Div([
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.H5(children='Snow:',
+                        dbc.Col(html.H5(children='Snow (in):',
                                 style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='Snow'),
                                 style={'display':'inline-block', 'margin-right': 20}),
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Snow Depth:',
+                        dbc.Col(html.H5(children='Snow Depth (in):',
                                 style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='snow_depth'),
                                 style={'display':'inline-block', 'margin-right': 20}),
                     ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Precipitation (mm):',
+                                        style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=80, id='Precipitation_indicator'),
+                                style={'display': 'inline-block', 'margin-right': 20})
+                    ]),
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.H5(children='Wind Speed:',
+                        dbc.Col(html.H5(children='Wind Speed (mph):',
                                 style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=50, id='wind_speed'),
                                 style={'display':'inline-block', 'margin-right': 20}),
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Wind Gust:',
+                        dbc.Col(html.H5(children='Wind Gust (mph):',
                                 style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=80, id='wind_gust'),
                                 style={'display':'inline-block', 'margin-right': 20}),
@@ -320,22 +335,22 @@ app.layout = html.Div([
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.H5(children='Maximum Temperature:')),
+                        dbc.Col(html.H5(children='Max Temperature (F):')),
                         dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='max_temp1'))
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Minimum Temperature:')),
+                        dbc.Col(html.H5(children='Min Temperature (F):')),
                         dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='min_temp1'))
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Temperature:')),
+                        dbc.Col(html.H5(children='Temperature (F):')),
                         dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='Temperature1'))
                     ]),
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
                         dbc.Col(
-                            html.H5(children='Visibility:', style={'display': 'inline-block', 'margin-right': 20})),
+                            html.H5(children='Visibility (ft):', style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=10, id='Visibility1'),
                                 style={'display':'inline-block', 'margin-right': 20})
                     ]),
@@ -347,30 +362,35 @@ app.layout = html.Div([
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.H5(children='Snow:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(html.H5(children='Snow (in):', style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='Snow1'),
                                 style={'display':'inline-block', 'margin-right': 20})
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Snow Depth:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(html.H5(children='Snow Depth (in):', style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=20, id='snow_depth1'),
                                 style={'display':'inline-block', 'margin-right': 20})
+                    ]),
+                    dbc.Row([
+                        dbc.Col(html.H5(children='Precipitation (mm):', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(dcc.Input(value=3, type='number', min=0, max=80, id='precipitation1'),
+                                style={'display': 'inline-block', 'margin-right': 20})
                     ]),
                 ], className='sidebyside'),
                 html.Div([
                     dbc.Row([
-                        dbc.Col(html.H5(children='Wind Speed:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(html.H5(children='Wind Speed (mph):', style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=50, id='wind_speed1'),
                                 style={'display':'inline-block', 'margin-right': 20})
                     ]),
                     dbc.Row([
-                        dbc.Col(html.H5(children='Wind Gust:', style={'display': 'inline-block', 'margin-right': 20})),
+                        dbc.Col(html.H5(children='Wind Gust (mph):', style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=0, max=80, id='wind_gust1'),
                                 style={'display':'inline-block', 'margin-right': 20})
                     ]),
                     dbc.Row([
                         dbc.Col(
-                            html.H5(children='Wind Chill:', style={'display': 'inline-block', 'margin-right': 20})),
+                            html.H5(children='Wind Chill (mph):', style={'display': 'inline-block', 'margin-right': 20})),
                         dbc.Col(dcc.Input(value=3, type='number', min=-10, max=50, id='wind_chill1'),
                                 style={'display':'inline-block', 'margin-right': 20})
                     ]),
@@ -456,14 +476,15 @@ def update_map(year, month, weekday, hour, ward):
     State('heat_index', 'value'),
     State('Snow', 'value'),
     State('snow_depth', 'value'),
+    State('Precipitation_indicator', 'value'),
     State('wind_speed', 'value'),
     State('wind_gust', 'value'),
     State('wind_chill', 'value')
 )
 def update_output(n_clicks, HOUR, WEEKDAY, MONTH, max_temp, min_temp, Temperature, Visibility,heat_index, Snow,
-                  snow_depth, wind_speed, wind_gust, wind_chill):
+                  snow_depth, Precipitation_indicator, wind_speed, wind_gust, wind_chill):
     x = np.array([[HOUR, WEEKDAY, MONTH, max_temp, min_temp, Temperature, Visibility, heat_index,
-                   Snow, snow_depth, wind_speed, wind_gust, wind_chill]])
+                   Snow, snow_depth, Precipitation_indicator, wind_speed, wind_gust, wind_chill]])
     prediction = regressor.predict(x)[0]
     return f'Results: Based on the selected conditions, the predicted number of car accidents is {prediction}.'
 
@@ -481,14 +502,15 @@ def update_output(n_clicks, HOUR, WEEKDAY, MONTH, max_temp, min_temp, Temperatur
     State('heat_index1', 'value'),
     State('Snow1', 'value'),
     State('snow_depth1', 'value'),
+    State('precipitation1', 'value'),
     State('wind_speed1', 'value'),
     State('wind_gust1', 'value'),
     State('wind_chill1', 'value')
 )
 def update_output(n_clicks, HOUR1, WEEKDAY1, MONTH1, max_temp1, min_temp1, Temperature1, Visibility1, heat_index1,
-                  Snow1, snow_depth1, wind_speed1, wind_gust1, wind_chill1):
+                  Snow1, snow_depth1, precipitation1, wind_speed1, wind_gust1, wind_chill1):
     x = np.array([[HOUR1, WEEKDAY1, MONTH1, max_temp1, min_temp1, Temperature1, Visibility1, heat_index1, Snow1,
-                   snow_depth1, wind_speed1, wind_gust1, wind_chill1]])
+                   snow_depth1, precipitation1, wind_speed1, wind_gust1, wind_chill1]])
     severity_pred = xgb_severity.predict(x)[0]
     print(severity_pred)
 
@@ -500,7 +522,7 @@ def update_output(n_clicks, HOUR1, WEEKDAY1, MONTH1, max_temp1, min_temp1, Tempe
         severity_pred = 'Fatal'
     else:
         severity_pred = 'Unknown'
-    return f'Results: Based on the selected conditions, the predicted severity of the accident is {severity_pred}'
+    return f'Results: Based on the selected conditions, the predicted severity of the accident is {severity_pred}.'
 
 
 if __name__ == '__main__':
