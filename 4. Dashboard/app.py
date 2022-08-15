@@ -132,6 +132,12 @@ app.layout = html.Div([
                     ### Machine Learning  
                     - XGBoost Algorithm was used for both predictive models
                       - [Learn more about XGBoost here!](https://machinelearningmastery.com/gentle-introduction-xgboost-applied-machine-learning/)
+                    - Regression Model 
+                      - Independent Variable: Count of accidents aggregated per day
+                      - Accuracy: 81% 
+                    - Classification Model
+                      - Classes: Minor injuries, Major Injuries, Fatal 
+                      - Accuracy: 97%   
                       
                     | Feature      | Description |
                     | ----------- | ----------- |
@@ -146,13 +152,6 @@ app.layout = html.Div([
                     | Visibility  | Distance that can be viewed  |     
                     | Precipitation   | Amount of liquid equivalent precipitation (rain, snow etc.)|     
                     | Weather Data Dictionary | [Link](https://www.visualcrossing.com/resources/documentation/weather-data/weather-data-documentation/)| 
-                      
-                    - Regression Model 
-                      - Independent Variable: Count of accidents aggregated per day
-                      - Accuracy: 81% 
-                    - Classification Model
-                      - Classes: Minor injuries, Major Injuries, Fatal 
-                      - Accuracy: 97%   
                     
                     ### Future Updates 
     
@@ -167,8 +166,7 @@ app.layout = html.Div([
                     
                     ### Github
                     Link to the project Github repository - [DC Traffic Crashes](https://github.com/joannechoi/DC_Traffic_Crashes)
-                
-                    ''', style={"height": '1200px'})]),
+                    ''', style={"height": '1132px'})]),
 
             ], className='mini_container'),
 
@@ -336,15 +334,18 @@ app.layout = html.Div([
                 html.Div([
                     dbc.Row([
                         dbc.Col(html.H5(children='Max Temperature (F):')),
-                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='max_temp1'))
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='max_temp1'),
+                                style={'display':'inline-block', 'margin-right': 20})
                     ]),
                     dbc.Row([
                         dbc.Col(html.H5(children='Min Temperature (F):')),
-                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='min_temp1'))
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='min_temp1'),
+                                style={'display':'inline-block', 'margin-right': 20})
                     ]),
                     dbc.Row([
                         dbc.Col(html.H5(children='Temperature (F):')),
-                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='Temperature1'))
+                        dbc.Col(dcc.Input(value=3, type='number', min=-100, max=100, id='Temperature1'),
+                                style={'display':'inline-block', 'margin-right': 20})
                     ]),
                 ], className='sidebyside'),
                 html.Div([
